@@ -58,7 +58,7 @@ func calDistancebyHaversine(x1, y1, x2, y2 float64) float64 {
 	sinDeltaLng := math.Sin(deltaLng / 2)
 	squareRoot := math.Sqrt(sinDeltaLat*sinDeltaLat + math.Cos(x1*toRadian)*math.Cos(x2*toRadian)*sinDeltaLng*sinDeltaLng)
 
-	HaverDistance = 2 * radius * math.Asin(squareRoot) * 1000 //m로 변환
+	HaverDistance = 2 * radius * math.Asin(squareRoot)
 
 	return HaverDistance
 }
