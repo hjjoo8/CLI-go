@@ -107,32 +107,37 @@ func main() {
 	json.Unmarshal(byteValue, &autogenerate)
 
 	// 가장 가까운 링크 위 좌표 찾기
-	for index, _ := range autogenerate.Features {
-		Xa := autogenerate.Features[index].Geometry.Coordinates[0][0]
-		Ya := autogenerate.Features[index].Geometry.Coordinates[0][1]
-		Xb := autogenerate.Features[index].Geometry.Coordinates[1][0]
-		Yb := autogenerate.Features[index].Geometry.Coordinates[1][1]
+	for index, _ := range autogenerate.Features { //autogenerate.Features
+		for ilen, _ := range autogenerate.Features[index].Geometry.Coordinates {
+			if ilen < len(autogenerate.Features[index].Geometry.Coordinates)-1 {
+				Xa := autogenerate.Features[index].Geometry.Coordinates[ilen][0]
+				Ya := autogenerate.Features[index].Geometry.Coordinates[ilen][1]
 
-		var a1 float64 = (Ya - Yb) / (Xa - Xb)
-		var b1 float64 = 1.0
-		var c float64 = -(a1*Xa + b1*Ya)
+				Xb := autogenerate.Features[index].Geometry.Coordinates[ilen+1][0]
+				Yb := autogenerate.Features[index].Geometry.Coordinates[ilen+1][1]
 
-		// a1*x + b1*y + c = 0 방정식과 (Px, Py) 사이의 거리 구하기
-		powavb := (math.Pow(a1, 2.0) / b1)
-		var denominator float64
-		denominator = math.Abs(a1*Px + b1*Py + c)
-		numerator2 := math.Pow(a1, 2.0) + math.Pow(b1, 2.0)
-		numerator := math.Sqrt(numerator2)
-		distance := denominator / numerator
+				var a1 float64 = (Ya - Yb) / (Xa - Xb)
+				var b1 float64 = 1.0
+				var c float64 = -(a1*Xa + Ya)
+				// a1*x + b1*y + c = 0, (Xa, Ya) (Xb, Yb) 두 점을 지나는 직선방정식
+				powavb := (math.Pow(a1, 2.0) / b1)
 
-		//H (Hx, Hy)구하기
-		Hy := (1 / (powavb + b1)) * (-Px*a1 - c + (Py * powavb))
-		Hx := a1*(Hy-Py)/b1 + Px
+				var denominator float64
+				denominator = math.Abs(a1*Px + b1*Py + c)
+				numerator2 := math.Pow(a1, 2.0) + math.Pow(b1, 2.0)
+				numerator := math.Sqrt(numerator2)
+				distance := denominator / numerator
 
-		if min_distance > distance { //최단 거리 정보 저장
-			min_distance = distance
-			min_Hx = Hx
-			min_Hy = Hy
+				//H (Hx, Hy)구하기
+				Hy := (1 / (powavb + b1)) * (-Px*a1 - c + (Py * powavb))
+				Hx := a1*(Hy-Py)/b1 + Px
+
+				if min_distance > distance { //최단 거리 정보 저장
+					min_distance = distance
+					min_Hx = Hx
+					min_Hy = Hy
+				}
+			}
 		}
 	}
 	//최단거리를 가진 (Hx, Hy)와 (Px, Py) 사이의 거리 구하기(하버사인 공식) (단위:m)
